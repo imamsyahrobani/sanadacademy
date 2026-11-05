@@ -16,6 +16,7 @@ import {
   Moon
 } from 'lucide-react';
 import { DEFAULT_USERS } from '../data/defaultUsers';
+import { signUpWithEmail, signInWithEmail } from '../services/authService';
 
 export default function LoginPage({ onLoginSuccess, theme, onToggleTheme }) {
   const [isRegisterMode, setIsRegisterMode] = useState(false);
@@ -54,28 +55,18 @@ export default function LoginPage({ onLoginSuccess, theme, onToggleTheme }) {
     return DEFAULT_USERS;
   };
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
     setErrorMessage('');
-    const users = getUsers();
-
-    const cleanInput = identifier.trim().toLowerCase();
-    const user = users.find(u => 
-      (u.email.toLowerCase() === cleanInput || 
-       u.email.toLowerCase().replace('@odoa.com', '@sanad.academy') === cleanInput ||
-       u.email.toLowerCase().replace('@sanad.academy', '@odoa.com') === cleanInput ||
-       u.whatsapp === identifier.trim()) &&
-      u.password === password
-    );
-
-    if (user) {
+    try {
+      const user = await signInWithEmail(identifier.trim(), password);
       onLoginSuccess(user);
-    } else {
-      setErrorMessage('Email/WhatsApp atau kata sandi tidak sesuai. Silakan periksa kembali.');
+    } catch (err) {
+      setErrorMessage(err.message || 'Email/WhatsApp atau kata sandi tidak sesuai. Silakan periksa kembali.');
     }
   };
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     setErrorMessage('');
     setSuccessMessage('');
@@ -85,36 +76,19 @@ export default function LoginPage({ onLoginSuccess, theme, onToggleTheme }) {
       return;
     }
 
-    const users = getUsers();
-    const existing = users.find(u => 
-      (regForm.email && u.email.toLowerCase() === regForm.email.toLowerCase()) ||
-      (regForm.whatsapp && u.whatsapp === regForm.whatsapp)
-    );
-
-    if (existing) {
-      setErrorMessage('Email atau nomor WhatsApp ini sudah terdaftar.');
-      return;
+    try {
+      await signUpWithEmail({
+        email: regForm.email.trim() || `${regForm.whatsapp}@sanad.academy`,
+        password: regForm.password,
+        fullName: regForm.name.trim(),
+        phone: regForm.whatsapp.trim()
+      });
+      setSuccessMessage('Alhamdulillah! Pendaftaran berhasil. Akun Anda menunggu verifikasi infaq oleh Ustadz.');
+      setRegForm({ name: '', whatsapp: '', email: '', password: '' });
+      setIsRegisterMode(false);
+    } catch (err) {
+      setErrorMessage(err.message || 'Gagal mendaftar. Coba lagi.');
     }
-
-    const newUser = {
-      id: `user_${Date.now()}`,
-      name: regForm.name.trim(),
-      email: regForm.email.trim() || `${regForm.whatsapp}@sanad.academy`,
-      whatsapp: regForm.whatsapp.trim(),
-      password: regForm.password,
-      role: 'santri',
-      status: 'pending', // Menunggu konfirmasi infaq oleh Ustadz
-      joinedDate: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }),
-      completedCourses: []
-    };
-
-    const updatedUsers = [...users, newUser];
-    localStorage.setItem('odoa_registered_users', JSON.stringify(updatedUsers));
-
-    setSuccessMessage('Alhamdulillah! Pendaftaran berhasil. Akun Anda menunggu verifikasi infaq oleh Ustadz.');
-    setIdentifier(newUser.email);
-    setPassword(newUser.password);
-    setIsRegisterMode(false);
   };
 
   const handleQuickLogin = (demoUser) => {

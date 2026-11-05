@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { initialCourses } from './data/initialCourses';
 import { DEFAULT_USERS } from './data/defaultUsers';
+import { getCurrentUser, signOut } from './services/authService';
 import Header from './components/Header';
 import CourseCatalog from './components/CourseCatalog';
 import CoursePlayer from './components/CoursePlayer';
@@ -336,7 +337,8 @@ export default function App() {
     showToast(`Ahlan wa Sahlan, ${user.name}!`);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await signOut();
     setCurrentUser(null);
     setIsAdminMode(false);
     setShowProfileModal(false);
