@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MessageSquare, Send, ThumbsUp, MessageCircle, X, HelpCircle, ShieldCheck } from 'lucide-react';
+import { getDiscussions, addDiscussion } from '../services/discussionService';
+import { supabase, isSupabaseConfigured } from '../lib/supabaseClient';
 
 export default function DiscussionModal({ isOpen, onClose, isAdminMode, onShowToast }) {
   const [comments, setComments] = useState(() => {
@@ -41,7 +43,39 @@ export default function DiscussionModal({ isOpen, onClose, isAdminMode, onShowTo
     ];
   });
 
-  const [inputNama, setInputNama] = useState('');
+  useEffect(() => {
+    if (!isOpen) return;
+    (async () => {
+      const rows = await getDiscussions();
+      if (!rows || rows.length === 0) return;
+      const top = rows.filter(r => !r.parent_id);
+      const byParent = rows.reduce((acc, r) => {
+        if (r.parent_id) {
+          (acc[r.parent_id] = acc[r.parent_id] || []).push(r);
+        }
+        return acc;
+      }, {});
+      const mapped = top.map(r => ({
+        id: r.id,
+        nama: r.author_name,
+        role: r.author_role,
+        waktu: new Date(r.created_at).toLocaleString('id-ID'),
+        teks: r.message,
+        likes: r.likes || 0,
+        isLiked: false,
+        replies: (byParent[r.id] || []).map(rep => ({
+          id: rep.id,
+          nama: rep.author_name,
+          role: rep.author_role,
+          waktu: new Date(rep.created_at).toLocaleString('id-ID'),
+          teks: rep.message,
+          likes: rep.likes || 0,
+          isLiked: false
+        }))
+      }));
+      setComments(mapped);
+    })();
+  }, [isOpen]);
   const [inputText, setInputText] = useState('');
   const [activeReplyId, setActiveReplyId] = useState(null);
   const [replyText, setReplyText] = useState('');
@@ -51,7 +85,7 @@ export default function DiscussionModal({ isOpen, onClose, isAdminMode, onShowTo
     localStorage.setItem('odoa_lms_discussions', JSON.stringify(newComments));
   };
 
-  const handleAddComment = (e) => {
+  const handleAddComment = async (e) => {
     e.preventDefault();
     if (!inputText.trim()) return;
 
@@ -71,6 +105,14 @@ export default function DiscussionModal({ isOpen, onClose, isAdminMode, onShowTo
     setInputText('');
     setInputNama('');
     onShowToast("Pertanyaan / refleksi berhasil dikirim!");
+
+    // Sync ke Supabase
+    await addDiscussion({
+      userId: null,
+      authorName: newComment.nama,
+      authorRole: newComment.role,
+      message: newComment.teks
+    });
   };
 
   const handleAddReply = (commentId) => {
