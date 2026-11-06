@@ -108,6 +108,20 @@ CREATE TABLE IF NOT EXISTS public.user_notes (
 );
 
 -- ========================================================
+-- 10. Forum Diskusi
+CREATE TABLE IF NOT EXISTS public.discussions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  user_id UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+  author_name TEXT NOT NULL,
+  author_role TEXT DEFAULT 'santri',
+  message TEXT NOT NULL,
+  parent_id UUID REFERENCES public.discussions(id) ON DELETE CASCADE,
+  likes INT DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+ALTER TABLE public.discussions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Discussions can be read by anyone" ON public.discussions FOR SELECT USING (true);
+CREATE POLICY "Authenticated users can insert discussions" ON public.discussions FOR INSERT WITH CHECK (auth.uid() = user_id);
 -- KEAMANAN: ROW LEVEL SECURITY (RLS)
 -- ========================================================
 ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
