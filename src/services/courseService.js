@@ -181,8 +181,23 @@ export async function syncLessonProgress(userId, lessonId) {
 }
 
 /**
- * Simpan Hasil Kuis Santri
+ * Ambil progres selesai pelajaran dari Supabase
  */
+export async function getUserProgress(userId) {
+  if (!isSupabaseConfigured() || !supabase || !userId) return [];
+  try {
+    const { data, error } = await supabase
+      .from('user_progress')
+      .select('lesson_id')
+      .eq('user_id', userId);
+    if (error) throw error;
+    return (data || []).map(r => r.lesson_id);
+  } catch (e) {
+    console.warn('Gagal ambil progres dari cloud:', e);
+    return [];
+  }
+}
+
 export async function syncQuizSubmission(userId, quizId, score, passed) {
   if (isSupabaseConfigured() && supabase && userId) {
     try {

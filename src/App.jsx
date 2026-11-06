@@ -20,7 +20,8 @@ import {
   seedInitialCoursesToSupabase, 
   syncLessonProgress, 
   syncQuizSubmission, 
-  syncCertificate 
+  syncCertificate,
+  getUserProgress
 } from './services/courseService';
 import { 
   BookOpen, 
@@ -343,6 +344,14 @@ export default function App() {
     setIsAdminMode(false);
     setShowProfileModal(false);
     showToast("Anda telah keluar dari akun.");
+  // Sync progres dari cloud saat user login
+  useEffect(() => {
+    if (currentUser?.id) {
+      getUserProgress(currentUser.id).then((ids) => {
+        if (ids && ids.length > 0) setCompletedLessons(ids);
+      });
+    }
+  }, [currentUser?.id]);
   };
 
   const handleUpdateName = (newName) => {
