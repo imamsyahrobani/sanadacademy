@@ -251,6 +251,25 @@ export async function syncNote(userId, lessonId, content) {
   }
 }
 
+/**
+ * Ambil sertifikat milik user dari Supabase
+ */
+export async function getUserCertificates(userId) {
+  if (!isSupabaseConfigured() || !supabase || !userId) return [];
+  try {
+    const { data, error } = await supabase
+      .from('certificates')
+      .select('*')
+      .eq('user_id', userId);
+    if (error) throw error;
+    return data || [];
+  } catch (e) {
+    console.warn('Gagal ambil sertifikat dari cloud:', e);
+    return [];
+  }
+}
+
+
 export async function syncCertificate(certData) {
   if (isSupabaseConfigured() && supabase && certData.userId) {
     try {

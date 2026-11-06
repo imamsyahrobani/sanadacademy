@@ -23,7 +23,8 @@ import {
   syncCertificate,
   getUserProgress,
   getUserNotes,
-  syncNote
+  syncNote,
+  getUserCertificates
 } from './services/courseService';
 import { 
   BookOpen, 
@@ -354,6 +355,9 @@ export default function App() {
       });
       getUserNotes(currentUser.id).then((notes) => {
         if (notes && Object.keys(notes).length > 0) setStudentNotes(notes);
+      });
+      getUserCertificates(currentUser.id).then((certs) => {
+        if (certs && certs.length > 0) setIssuedCertificates(certs);
       });
     }
   }, [currentUser?.id]);

@@ -134,7 +134,9 @@ ALTER TABLE public.quiz_submissions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.certificates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.user_notes ENABLE ROW LEVEL SECURITY;
 
--- Kebijakan Membaca Kursus & Materi: Terbuka untuk semua user yang login / terverifikasi
+-- Kebijakan Profil: user bisa baca & update profil sendiri
+CREATE POLICY "Users can read own profile" ON public.profiles FOR SELECT USING (auth.uid() = id);
+CREATE POLICY "Users can update own profile" ON public.profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Courses can be read by anyone" ON public.courses FOR SELECT USING (true);
 CREATE POLICY "Modules can be read by anyone" ON public.modules FOR SELECT USING (true);
 CREATE POLICY "Lessons can be read by anyone" ON public.lessons FOR SELECT USING (true);
