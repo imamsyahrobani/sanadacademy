@@ -215,8 +215,42 @@ export async function syncQuizSubmission(userId, quizId, score, passed) {
 }
 
 /**
- * Simpan Sertifikat Kelulusan
+ * Ambil catatan pribadi santri dari Supabase
  */
+export async function getUserNotes(userId) {
+  if (!isSupabaseConfigured() || !supabase || !userId) return {};
+  try {
+    const { data, error } = await supabase
+      .from('user_notes')
+      .select('lesson_id, note_content')
+      .eq('user_id', userId);
+    if (error) throw error;
+    const map = {};
+    (data || []).forEach(r => { map[r.lesson_id] = r.note_content; });
+    return map;
+  } catch (e) {
+    console.warn('Gagal ambil catatan dari cloud:', e);
+    return {};
+  }
+}
+
+/**
+ * Simpan/Update catatan pribadi santri
+ */
+export async function syncNote(userId, lessonId, content) {
+  if (!isSupabaseConfigured() || !supabase || !userId) return;
+  try {
+    await supabase.from('user_notes').upsert({
+      user_id: userId,
+      lesson_id: lessonId,
+      note_content: content,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id,lesson_id' });
+  } catch (e) {
+    console.warn('Gagal simpan catatan ke cloud:', e);
+  }
+}
+
 export async function syncCertificate(certData) {
   if (isSupabaseConfigured() && supabase && certData.userId) {
     try {

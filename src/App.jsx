@@ -21,7 +21,9 @@ import {
   syncLessonProgress, 
   syncQuizSubmission, 
   syncCertificate,
-  getUserProgress
+  getUserProgress,
+  getUserNotes,
+  syncNote
 } from './services/courseService';
 import { 
   BookOpen, 
@@ -344,14 +346,26 @@ export default function App() {
     setIsAdminMode(false);
     setShowProfileModal(false);
     showToast("Anda telah keluar dari akun.");
-  // Sync progres dari cloud saat user login
+  // Sync progres & catatan dari cloud saat user login
   useEffect(() => {
     if (currentUser?.id) {
       getUserProgress(currentUser.id).then((ids) => {
         if (ids && ids.length > 0) setCompletedLessons(ids);
       });
+      getUserNotes(currentUser.id).then((notes) => {
+        if (notes && Object.keys(notes).length > 0) setStudentNotes(notes);
+      });
     }
   }, [currentUser?.id]);
+
+  // Sync catatan ke cloud saat berubah
+  useEffect(() => {
+    if (currentUser?.id && studentNotes) {
+      Object.entries(studentNotes).forEach(([lessonId, content]) => {
+        syncNote(currentUser.id, lessonId, content);
+      });
+    }
+  }, [studentNotes, currentUser?.id]);
   };
 
   const handleUpdateName = (newName) => {
