@@ -15,7 +15,7 @@ export default function LandingPage({ onEnter }) {
         </p>
         <button
           onClick={onEnter}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-2xl shadow-lg"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-emerald-900/20"
         >
           Daftar Sekarang — Gratis <ArrowRight className="w-4 h-4" />
         </button>
@@ -50,7 +50,7 @@ export default function LandingPage({ onEnter }) {
       <section className="px-4 py-12 text-center">
         <button
           onClick={onEnter}
-          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-2xl shadow-lg"
+          className="inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-500 active:scale-95 transition text-white font-bold px-7 py-3.5 rounded-2xl shadow-lg shadow-emerald-900/20"
         >
           Mulai Belajar Sekarang <ArrowRight className="w-4 h-4" />
         </button>
