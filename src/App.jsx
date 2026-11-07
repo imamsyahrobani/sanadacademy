@@ -10,6 +10,7 @@ import QuizModal from './components/QuizModal';
 import CertificateModal from './components/CertificateModal';
 import DiscussionModal from './components/DiscussionModal';
 import QuranModal from './components/QuranModal';
+import LandingPage from './components/LandingPage';
 import LoginPage from './components/LoginPage';
 import ProfileModal from './components/ProfileModal';
 import CloudStatusModal from './components/CloudStatusModal';
@@ -57,7 +58,7 @@ export default function App() {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
   };
 
-  // 1. Current Logged-in User State (Persisted in localStorage)
+  const [showLogin, setShowLogin] = useState(false);
   const [currentUser, setCurrentUser] = useState(() => {
     const saved = localStorage.getItem('odoa_current_user');
     if (saved) {
@@ -450,8 +451,11 @@ export default function App() {
 
   // IF NOT LOGGED IN, RENDER AUTH PAGE
   if (!currentUser) {
+    if (!showLogin) {
+      return <LandingPage onEnter={() => setShowLogin(true)} />;
+    }
     return (
-      <LoginPage 
+      <LoginPage
         onLoginSuccess={handleLoginSuccess}
         theme={theme}
         onToggleTheme={handleToggleTheme}
