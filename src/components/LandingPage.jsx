@@ -13,6 +13,12 @@ export default function LandingPage({ onEnter }) {
         <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
           Temukan Ketenangan Hati Melalui Pemahaman Islam yang Mendalam, Kapan Saja & Di Mana Saja.
         </h1>
+<h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
+          Temukan Ketenangan Hati Melalui Pemahaman Islam yang Mendalam, Kapan Saja & Di Mana Saja.
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 text-xs mb-4">
+          Pengajar Utama: Ustad Imam Syahrobani, M.pd, Al-hafidz
+        </p>
         <p className="text-slate-600 dark:text-slate-300 mb-6">
           SANAD ACADEMY — platform pembelajaran Islam online: tadabbur, sabar, ruqyah syar’iyyah, fikih.
           Audio/video, kuis interaktif, catatan pribadi, sertifikat kelulusan. Gratis, cukup daftar.
